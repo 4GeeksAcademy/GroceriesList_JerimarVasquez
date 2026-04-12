@@ -1,75 +1,113 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const API = "https://playground.4geeks.com/todo/todos/alesanchezr"
+const API = "http://localhost:3001/todos";
 
-//create your first component
-const Home = () => {
+function TodoList() {
+  const [task, setTask] = useState("");
+  const [tasks, setTasks] = useState([]);
 
-	const GetProducts = () => {
-		fetch('${API/USER}', {
-			method: "GET",
-			body: JSON.stringify(task),
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => {
-				if(!resp.ok) throw Error('Ha ocuerrido algun error')
-				return resp.json(); // Intentará parsear el resultado a JSON y retornará una promesa donde puedes usar .then para seguir con la lógica
-			})
-			.then(respJson => {
-				// Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-				console.log(respJson); // Esto imprimirá en la consola el objeto exacto recibido del servidor
-			})
-			.catch(error => {
-				// Manejo de errores
-				console.log(error);
-			});
-	}
+  const getTasks = () => {
+    fetch(API)
+      .then((resp) => resp.json())
+      .then((data) => setTasks(data))
+      .catch((err) => console.log("Error obteniendo tareas:", err));
+  };
 
-	//let nuevoTodo="";
-	const [nuevoTodo, setNuevoTodo] = useState("Tarea nueva");
-	const [todos, setTodos] = useState(["Una tarea", "Dos tarea", "tres tareas"])
+  const addTask = () => {
+    if (task.trim() === "") return;
 
-	const handleClick = () => {
-		console.log("Nueva tarea", nuevoTodo);
-		setTodos([...todos, nuevoTodo])
-	}
+    fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        label: task,
+        is_done: false
+      })
+    })
+      .then(() => {
+        setTask("");
+        getTasks();
+      })
+      .catch((err) => console.log("Error agregando tarea:", err));
+  };
 
-	const deleteTodo = (indice) => {
-		console.log(indice);
-		const listNueva = todos.filter((todo, i) => i !== indice)
-		setTodos(listNueva);
-	}
+  const handleDelete = (id) => {
+    fetch(`${API}/${id}`, {
+      method: "DELETE"
+    })
+      .then(() => getTasks())
+      .catch((err) => console.log("Error eliminando tarea:", err));
+  };
 
-	const handleChange = (event) => {
-		setNuevoTodo(event.target.value);
+  const deleteAll = async () => {
+    try {
+      const resp = await fetch(API);
+      const data = await resp.json();
 
-		//console.log(event.target.value);
-		//setNuevoTodo (event.target.value);
-		//console.log("Saludo desde el evento de cambio")
-	}
+      await Promise.all(
+        data.map((t) =>
+          fetch(`${API}/${t.id}`, { method: "DELETE" })
+        )
+      );
 
-	return (
-		<div className="text-center">
+      setTasks([]);
+    } catch (err) {
+      console.log("Error eliminando todas:", err);
+    }
+  };
 
-			<h1 className="text-center mt-5">Shopping List</h1>
-			<div>
-				<input type="text" onChange={handleChange} />
-				<button onClick={handleClick}>Add task</button>
-			</div>
-			<p>New Task: {nuevoTodo}</p>
-			<ul>
-				{todos.map((todos, indice) => {
-					return (
-						<li>
-							{todos} <button onClick={() => deleteTodo(indice)}>Borrar</button>
-						</li>
-					)
-				})}
-			</ul>
-		</div>
-	);
-};
+  useEffect(() => {
+    getTasks();
+  }, []);
 
-export default Home;
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") addTask();
+  };
+
+  return (
+    <div className="todo-container">
+      <h1>Lista de tareas</h1>
+
+      <input
+        type="text"
+        placeholder="Añadir tarea"
+        value={task}
+        onChange={(e) => setTask(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+
+      <button onClick={addTask}>Agregar</button>
+
+      <button onClick={deleteAll} className="btn btn-danger ms-2">
+        Borrar todas
+      </button>
+
+      <ul>
+        {tasks.length === 0 ? (
+          <li className="empty">No hay tareas, añadir tareas</li>
+        ) : (
+          tasks.map((t) => (
+            <li key={t.id} className="task-item">
+              <span
+                style={{
+                  textDecoration: t.is_done ? "line-through" : "none"
+                }}
+              >
+                {t.label}
+              </span>
+
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(t.id)}
+              >
+                ✖
+              </button>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;

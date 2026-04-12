@@ -1,11 +1,44 @@
-/* 
 
-    You can write your own styles here...
-    
-    
-    ...Or you can use the import command to include 
-    other sylesheets into your bunde as well, e.j:
-    
-    import 'relative/path/to/stylesheet.scss';
+.todo-container {
+  width: 300px;
+  margin: 40px auto;
+  font-family: sans-serif;
+}
 
-*/
+input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  visibility: hidden; /* Oculto por defecto */
+}
+
+.task-item:hover .delete-btn {
+  visibility: visible; /* Solo se ve en hover */
+}
+
+.empty {
+  color: #777;
+  font-style: italic;
+}

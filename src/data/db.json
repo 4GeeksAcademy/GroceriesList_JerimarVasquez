@@ -1,0 +1,11 @@
+{
+  "todos": [
+    { "id": 1, "label": "Comprar pan", "is_done": false },
+    { "id": 2, "label": "Estudiar React", "is_done": false },
+    { "id": 3, "label": "Lavar la ropa", "is_done": true }
+  ],
+  "users": [
+    { "id": 1, "username": "jerimar" },
+    { "id": 2, "username": "alesanchezr" }
+  ]
+}
