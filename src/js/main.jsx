@@ -1,18 +1,18 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-//Bootstrap
+// Bootstrap global
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap"
+import "bootstrap";
 
-// index.css'
-import '../styles/index.css'
+// Estilos globales
+import '../styles/index.css';
 
-// components
+// Componente principal
 import Home from './components/Home';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Home/>
-  </React.StrictMode>,
-)
+    <Home />
+  </React.StrictMode>
+);

@@ -1,113 +1,84 @@
 import React, { useEffect, useState } from "react";
 
-const API = "http://localhost:3001/todos";
+const API = "https://playground.4geeks.com/todo";
+const USER = "JerimarV";
 
-function TodoList() {
-  const [task, setTask] = useState("");
+const Home = () => {
   const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState("");
 
-  const getTasks = () => {
-    fetch(API)
-      .then((resp) => resp.json())
-      .then((data) => setTasks(data))
-      .catch((err) => console.log("Error obteniendo tareas:", err));
+  const createUser = async () => {
+    await fetch(`${API}/users/${USER}`, { method: "POST" })
+      .catch(err => console.error(err));
   };
 
-  const addTask = () => {
-    if (task.trim() === "") return;
+  const getTasks = async () => {
+    const resp = await fetch(`${API}/users/${USER}`);
+    const data = await resp.json();
+    setTasks(data.todos || []);
+  };
 
-    fetch(API, {
+  const addTask = async () => {
+    if (newTask.trim() === "") return;
+
+    await fetch(`${API}/todos/${USER}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        label: task,
+        label: newTask,
         is_done: false
       })
-    })
-      .then(() => {
-        setTask("");
-        getTasks();
-      })
-      .catch((err) => console.log("Error agregando tarea:", err));
+    });
+
+    setNewTask("");
+    getTasks();
   };
 
-  const handleDelete = (id) => {
-    fetch(`${API}/${id}`, {
-      method: "DELETE"
-    })
-      .then(() => getTasks())
-      .catch((err) => console.log("Error eliminando tarea:", err));
-  };
-
-  const deleteAll = async () => {
-    try {
-      const resp = await fetch(API);
-      const data = await resp.json();
-
-      await Promise.all(
-        data.map((t) =>
-          fetch(`${API}/${t.id}`, { method: "DELETE" })
-        )
-      );
-
-      setTasks([]);
-    } catch (err) {
-      console.log("Error eliminando todas:", err);
-    }
+  const deleteTask = async (id) => {
+    await fetch(`${API}/todos/${id}`, { method: "DELETE" });
+    getTasks();
   };
 
   useEffect(() => {
-    getTasks();
+    const init = async () => {
+      await createUser();
+      await getTasks();
+    };
+    init();
   }, []);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") addTask();
-  };
-
   return (
-    <div className="todo-container">
-      <h1>Lista de tareas</h1>
+    <div className="todo-box">
+      <h1 className="text-center mb-4">List of {USER}</h1>
 
-      <input
-        type="text"
-        placeholder="Añadir tarea"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <div className="input-group">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="New product"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && addTask()}
+        />
+        <button className="btn btn-primary" onClick={addTask}>
+          Add
+        </button>
+      </div>
 
-      <button onClick={addTask}>Agregar</button>
-
-      <button onClick={deleteAll} className="btn btn-danger ms-2">
-        Borrar todas
-      </button>
-
-      <ul>
+      <ul className="mt-4">
         {tasks.length === 0 ? (
-          <li className="empty">No hay tareas, añadir tareas</li>
+          <li className="text-center">No products yet</li>
         ) : (
-          tasks.map((t) => (
-            <li key={t.id} className="task-item">
-              <span
-                style={{
-                  textDecoration: t.is_done ? "line-through" : "none"
-                }}
-              >
-                {t.label}
-              </span>
-
-              <button
-                className="delete-btn"
-                onClick={() => handleDelete(t.id)}
-              >
-                ✖
-              </button>
+          tasks.map((task) => (
+            <li key={task.id} className="task-item">
+              {task.label}
+              <button onClick={() => deleteTask(task.id)}>X</button>
             </li>
           ))
         )}
       </ul>
     </div>
   );
-}
+};
 
-export default TodoList;
+export default Home;

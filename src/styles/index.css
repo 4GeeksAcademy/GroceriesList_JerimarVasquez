@@ -1,44 +1,38 @@
-
-.todo-container {
-  width: 300px;
-  margin: 40px auto;
-  font-family: sans-serif;
+body {
+  background: #f5f5f5;
+  font-family: Arial, sans-serif;
 }
 
-input {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
+.todo-box {
+  background-color: #f0f0f0;
+  border: 2px solid #4fe7b1;
+  max-width: 550px;
+  margin: 50px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .task-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 4px;
-  border-bottom: 1px solid #ddd;
-  position: relative;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
 }
 
-.delete-btn {
-  background: transparent;
+.task-item button {
   border: none;
-  color: red;
+  background: transparent;
+  color: rgb(255, 0, 89);
+  font-weight: bold;
   cursor: pointer;
-  visibility: hidden; /* Oculto por defecto */
 }
 
-.task-item:hover .delete-btn {
-  visibility: visible; /* Solo se ve en hover */
-}
-
-.empty {
-  color: #777;
-  font-style: italic;
+.task-item button:hover {
+  color: darkred;
 }
